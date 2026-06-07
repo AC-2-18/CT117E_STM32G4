@@ -11,8 +11,8 @@
 #include "tim.h"
 #include "usart.h"
 
-/* ===== 项目信息 - 修改此处 GIT_URL 为你自己的仓库地址 ===== */
-#define GIT_URL  "github.com/AC-2-18/-"
+/* ===== 项目信息 ===== */
+#define GIT_URL  "github.com/AC-2-18/CT117E_STM32G4"
 
 /* ===== 按键结构 ===== */
 struct keys{
