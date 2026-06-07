@@ -1,0 +1,13 @@
+# Keil MDK-ARM ????
+MDK-ARM/1/
+MDK-ARM/DebugConfig/
+MDK-ARM/RTE/
+MDK-ARM/*.uvguix.*
+MDK-ARM/*.lst
+MDK-ARM/*.scvd
+
+# ????
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
