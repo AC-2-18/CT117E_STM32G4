@@ -277,50 +277,65 @@ void led_proc(void){
 }
 
 /* ================================================================
- *  进程函数 - LCD 显示
- *  显示项目信息 + GitHub 地址, 供下一届同学获取资料
+ *  进程函数 - LCD 显示 (分页)
+ *  按 KEY4 切换页面
+ *  Page 0: GitHub 项目信息
+ *  Page 1: 模块实时数据
  * ================================================================ */
 void lcd_proc(void){
 	if(uwTick - lcd_tick<100)
 		return;
 	lcd_tick = uwTick;
 
-	/* Line0: 标题 */
-	sprintf(lcd_buf,"  CT117E STM32G4 Board");
-	LCD_DisplayStringLine(Line0, (u8*)lcd_buf);
+	if(lcd_page == 0){
+		/* ---- Page 0: 项目信息 + GitHub ---- */
+		sprintf(lcd_buf,"CT117E STM32G4 Board");
+		LCD_DisplayStringLine(Line0, (u8*)lcd_buf);
 
-	/* Line1-Line2: GitHub 地址 */
-	sprintf(lcd_buf,"GitHub: %s",GIT_URL);
-	LCD_DisplayStringLine(Line1, (u8*)lcd_buf);
+		sprintf(lcd_buf,"github.com/AC-2-18");
+		LCD_DisplayStringLine(Line2, (u8*)lcd_buf);
 
-	/* Line3: 分隔线 */
-	sprintf(lcd_buf,"====================");
-	LCD_DisplayStringLine(Line3, (u8*)lcd_buf);
+		sprintf(lcd_buf,"/CT117E_STM32G4");
+		LCD_DisplayStringLine(Line3, (u8*)lcd_buf);
 
-	/* Line4: ADC */
-	sprintf(lcd_buf,"ADC PB14:%.2fV PB15:%.2fV",PB14_Volt,PB15_Volt);
-	LCD_DisplayStringLine(Line4, (u8*)lcd_buf);
+		sprintf(lcd_buf,"KEY4 -> module data");
+		LCD_DisplayStringLine(Line7, (u8*)lcd_buf);
 
-	/* Line5: 输入捕获 */
-	sprintf(lcd_buf,"CAP:%dHz %d%%",PA15_Frq,PA15_Duty);
-	LCD_DisplayStringLine(Line5, (u8*)lcd_buf);
+		sprintf(lcd_buf,"==================");
+		LCD_DisplayStringLine(Line8, (u8*)lcd_buf);
+	}
+	else{
+		/* ---- Page 1: 模块实时数据 ---- */
+		sprintf(lcd_buf,"== Module Data ==");
+		LCD_DisplayStringLine(Line0, (u8*)lcd_buf);
 
-	/* Line6: PWM */
-	sprintf(lcd_buf,"PWM PA6:%dHz PA7:%dHz",PA6_F,PA7_F);
-	LCD_DisplayStringLine(Line6, (u8*)lcd_buf);
+		sprintf(lcd_buf,"ADC:%.2fV %.2fV",PB14_Volt,PB15_Volt);
+		LCD_DisplayStringLine(Line2, (u8*)lcd_buf);
 
-	/* Line7: RTC */
-	sprintf(lcd_buf,"RTC:%02d:%02d:%02d",T.Hours,T.Minutes,T.Seconds);
-	LCD_DisplayStringLine(Line7, (u8*)lcd_buf);
+		sprintf(lcd_buf,"CAP:%dHz %d%%",PA15_Frq,PA15_Duty);
+		LCD_DisplayStringLine(Line3, (u8*)lcd_buf);
 
-	/* Line8: 分隔线 */
-	sprintf(lcd_buf,"====================");
-	LCD_DisplayStringLine(Line8, (u8*)lcd_buf);
+		sprintf(lcd_buf,"PWM:%dHz %dHz",PA6_F,PA7_F);
+		LCD_DisplayStringLine(Line4, (u8*)lcd_buf);
+
+		sprintf(lcd_buf,"RTC:%02d:%02d:%02d",T.Hours,T.Minutes,T.Seconds);
+		LCD_DisplayStringLine(Line5, (u8*)lcd_buf);
+
+		sprintf(lcd_buf,"EEPROM:%d",EEP_value);
+		LCD_DisplayStringLine(Line6, (u8*)lcd_buf);
+
+		sprintf(lcd_buf,"KEY4 <- project");
+		LCD_DisplayStringLine(Line7, (u8*)lcd_buf);
+
+		sprintf(lcd_buf,"==================");
+		LCD_DisplayStringLine(Line8, (u8*)lcd_buf);
+	}
 }
 
 /* ================================================================
  *  进程函数 - 按键处理
  *  短按 B0/B1/B2 -> EEPROM 写入不同值
+ *  短按 KEY4(B3) -> LCD 翻页
  *  长按 B0/B1   -> MCP DAC 加减
  * ================================================================ */
 void key_proc(void){
@@ -336,7 +351,10 @@ void key_proc(void){
 				case 0:{ EEP_Write(14,120); }break;
 				case 1:{ EEP_Write(14,130); }break;
 				case 2:{ EEP_Write(14,10);  }break;
-				case 3:{ /* 保留 */ }break;
+				case 3:{		// KEY4 -> 翻页
+					lcd_page = !lcd_page;
+					LCD_Clear(Black);
+				}break;
 			}
 		}
 		if(key[i].key_lflg==1){
